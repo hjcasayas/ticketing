@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import { AuthRouter } from "./routes/auth";
-import { ErrorHandler } from "./middlewares";
+import { AuthRouter } from './routes/auth';
+import { ErrorHandler } from './middlewares';
 import { NotFoundError } from './errors/not-found.error';
 import { connect } from 'mongoose';
 
@@ -11,21 +11,25 @@ app.use(express.json());
 app.use(AuthRouter);
 
 app.all('*', () => {
-    throw new NotFoundError();
-})
+  throw new NotFoundError();
+});
 
-app.use(ErrorHandler)
+app.use(ErrorHandler);
 
-const start = () => {
-    connect('mongodb://auth-mongo-service:27107/auth', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }).then(
-        () => {
-            console.log(`Connected to MongoDB`)
-        }
-    ).catch(error => {
-        console.error(error)
+const start = async () => {
+  try {
+    await connect('mongodb://auth-mongo-service:27017/auth', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
     });
-    const PORT = 3000;
-    app.listen(PORT, () => console.log(`listening on ${PORT}!!!!`));
-}
+    console.log(`Connected to MongoDB`);
+  } catch (error) {
+    console.error({ error });
+  }
+
+  const PORT = 3000;
+  app.listen(PORT, () => console.log(`listening on ${PORT}.`));
+};
 
 start();
